@@ -1,26 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topinc/services/auth/auth_service.dart';
-import 'package:topinc/components/my_button.dart';
-import 'package:topinc/components/my_textField.dart';
 
-class LoginPage extends StatelessWidget {
+import '../components/my_button.dart';
+import '../components/my_textField.dart';
+
+class RegisterPage extends StatelessWidget {
   // TextController for E-Mail and password
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
-  final void Function()? onRegisterTap;
+  final TextEditingController _pwConfirmController = TextEditingController();
+  final void Function()? onLoginTap;
+  RegisterPage({super.key, required this.onLoginTap});
 
-  LoginPage({super.key, required this.onRegisterTap});
+  void register(BuildContext context) {
+    final _auth = AuthService();
+    if(_pwController.text == _pwConfirmController.text){
+      try{
+        _auth.signUpWithEmailAndPassword(_emailController.text, _pwController.text);
+      }catch (e){
+        showDialog(context: context, builder: (context) => AlertDialog(title: Text(e.toString()),));
+      }
+    }else{
+      showDialog(context: context, builder: (context) => const AlertDialog(title: Text("Passwords don't match"),));
 
-  void login(BuildContext context) async{
-    final authService = AuthService();
-    try{
-      await authService.signInWithEmailAndPassword(_emailController.text, _pwController.text);
-    }
-    catch (e) {
-      showDialog(context: context, builder: (context)=> AlertDialog(
-        title: Text(e.toString()),
-      ));
     }
   }
 
@@ -35,7 +38,7 @@ class LoginPage extends StatelessWidget {
             Icon(Icons.message,
                 size: 60, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 50),
-            Text("Welcome back, you've been missed!",
+            Text("Create your Account",
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 16)),
@@ -56,24 +59,33 @@ class LoginPage extends StatelessWidget {
               controller: _pwController, focusNode: null,
             ),
             const SizedBox(
+              height: 10,
+            ),
+            MyTextField(
+              hintText: "Confrim Password",
+              obscure: true,
+              controller: _pwConfirmController, focusNode: null,
+            ),
+            const SizedBox(
               height: 25,
             ),
-            MyButton(text: "Login", onTap: () => login(context)),
+            MyButton(text: "Register", onTap: ()=>register(context)),
             const SizedBox(
               height: 25,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Not am member? ",
+                Text("Already have an account?",
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.primary)),
                 GestureDetector(
-                    onTap: onRegisterTap,
-                    child: Text("Register Now",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary)))
+                  onTap: onLoginTap,
+                  child: Text("Login now",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary)),
+                )
               ],
             )
           ],

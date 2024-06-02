@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:topinc/Pages/login_page.dart';
-import 'package:topinc/Themes/light_mode.dart';
+import 'package:provider/provider.dart';
+import 'package:topinc/Themes/theme_provider.dart';
+import 'package:topinc/services/auth/auth_gate.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:topinc/firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(
+    ChangeNotifierProvider(
+      create: (context)=> ThemeProvider(),
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,8 +24,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: lightMode,
-      home: LoginPage(),
+      theme: Provider.of<ThemeProvider>(context).themeData,
+      home: AuthGate(),
     );
   }
 }

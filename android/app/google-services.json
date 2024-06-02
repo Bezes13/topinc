@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "755840856645",
+    "project_id": "topinc-8baca",
+    "storage_bucket": "topinc-8baca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755840856645:android:36eaa173d66c35439fa92c",
+        "android_client_info": {
+          "package_name": "com.example.topinc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuM5ZCBS-U8nkiOS10GmRSJ6pmcRl0h5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
