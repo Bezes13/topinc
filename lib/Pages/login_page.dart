@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topinc/services/auth/auth_service.dart';
 import 'package:topinc/components/my_button.dart';
-import 'package:topinc/components/my_textField.dart';
+import 'package:topinc/components/my_text_field.dart';
 
 class LoginPage extends StatelessWidget {
   // TextController for E-Mail and password
@@ -12,15 +11,19 @@ class LoginPage extends StatelessWidget {
 
   LoginPage({super.key, required this.onRegisterTap});
 
-  void login(BuildContext context) async{
+  void login(BuildContext context) async {
     final authService = AuthService();
-    try{
-      await authService.signInWithEmailAndPassword(_emailController.text, _pwController.text);
-    }
-    catch (e) {
-      showDialog(context: context, builder: (context)=> AlertDialog(
-        title: Text(e.toString()),
-      ));
+    try {
+      await authService.signInWithEmailAndPassword(
+          _emailController.text, _pwController.text);
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text(e.toString()),
+                ));
+      }
     }
   }
 
@@ -45,7 +48,8 @@ class LoginPage extends StatelessWidget {
             MyTextField(
               hintText: "Email",
               obscure: false,
-              controller: _emailController, focusNode: null,
+              controller: _emailController,
+              focusNode: null,
             ),
             const SizedBox(
               height: 10,
@@ -53,7 +57,8 @@ class LoginPage extends StatelessWidget {
             MyTextField(
               hintText: "Password",
               obscure: true,
-              controller: _pwController, focusNode: null,
+              controller: _pwController,
+              focusNode: null,
             ),
             const SizedBox(
               height: 25,

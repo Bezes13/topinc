@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topinc/services/auth/auth_service.dart';
 
 import '../components/my_button.dart';
-import '../components/my_textField.dart';
+import '../components/my_text_field.dart';
 
 class RegisterPage extends StatelessWidget {
   // TextController for E-Mail and password
@@ -11,19 +10,28 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _pwController = TextEditingController();
   final TextEditingController _pwConfirmController = TextEditingController();
   final void Function()? onLoginTap;
+
   RegisterPage({super.key, required this.onLoginTap});
 
   void register(BuildContext context) {
-    final _auth = AuthService();
-    if(_pwController.text == _pwConfirmController.text){
-      try{
-        _auth.signUpWithEmailAndPassword(_emailController.text, _pwController.text);
-      }catch (e){
-        showDialog(context: context, builder: (context) => AlertDialog(title: Text(e.toString()),));
+    final auth = AuthService();
+    if (_pwController.text == _pwConfirmController.text) {
+      try {
+        auth.signUpWithEmailAndPassword(
+            _emailController.text, _pwController.text);
+      } catch (e) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text(e.toString()),
+                ));
       }
-    }else{
-      showDialog(context: context, builder: (context) => const AlertDialog(title: Text("Passwords don't match"),));
-
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => const AlertDialog(
+                title: Text("Passwords don't match"),
+              ));
     }
   }
 
@@ -48,7 +56,8 @@ class RegisterPage extends StatelessWidget {
             MyTextField(
               hintText: "Email",
               obscure: false,
-              controller: _emailController, focusNode: null,
+              controller: _emailController,
+              focusNode: null,
             ),
             const SizedBox(
               height: 10,
@@ -56,7 +65,8 @@ class RegisterPage extends StatelessWidget {
             MyTextField(
               hintText: "Password",
               obscure: true,
-              controller: _pwController, focusNode: null,
+              controller: _pwController,
+              focusNode: null,
             ),
             const SizedBox(
               height: 10,
@@ -64,12 +74,13 @@ class RegisterPage extends StatelessWidget {
             MyTextField(
               hintText: "Confrim Password",
               obscure: true,
-              controller: _pwConfirmController, focusNode: null,
+              controller: _pwConfirmController,
+              focusNode: null,
             ),
             const SizedBox(
               height: 25,
             ),
-            MyButton(text: "Register", onTap: ()=>register(context)),
+            MyButton(text: "Register", onTap: () => register(context)),
             const SizedBox(
               height: 25,
             ),

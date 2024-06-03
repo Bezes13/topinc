@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:topinc/services/auth/auth_service.dart';
 import 'package:topinc/services/chat/chat_sersvice.dart';
 
 import '../components/my_drawer.dart';
@@ -9,19 +8,18 @@ import 'chat_page.dart';
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  final AuthService _authService = AuthService();
   final ChatService _chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Topinc"),
+        title: const Text("Topinc"),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
       ),
-      drawer: MyDrawer(),
+      drawer: const MyDrawer(),
       body: _buildUserList(),
     );
   }

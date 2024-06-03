@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:topinc/components/chat_bubble.dart';
-import 'package:topinc/components/my_textField.dart';
+import 'package:topinc/components/my_text_field.dart';
 
 import '../services/auth/auth_service.dart';
 import '../services/chat/chat_sersvice.dart';
@@ -10,7 +10,8 @@ class ChatPage extends StatefulWidget {
   final String receiverEmail;
   final String receiverId;
 
-  ChatPage({super.key, required this.receiverEmail, required this.receiverId});
+  const ChatPage(
+      {super.key, required this.receiverEmail, required this.receiverId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -125,11 +126,11 @@ class _ChatPageState extends State<ChatPage> {
             focusNode: myFocusNode,
           )),
           Container(
-              decoration:
-                  BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                  color: Colors.green, shape: BoxShape.circle),
               margin: const EdgeInsets.only(right: 25),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.send,
                   color: Colors.white,
                 ),

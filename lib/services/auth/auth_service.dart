@@ -32,9 +32,11 @@ class AuthService {
     return await _auth.signOut();
   }
 
-  Future<UserCredential> signUpWithEmailAndPassword(String email, String password) async{
-    try{
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+  Future<UserCredential> signUpWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       _firestore.collection("Users").doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
