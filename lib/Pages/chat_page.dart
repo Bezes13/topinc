@@ -1,87 +1,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:topinc/components/chat_bubble.dart';
+import 'package:topinc/components/chat_tab.dart';
+import 'package:topinc/components/my_button.dart';
 import 'package:topinc/components/my_text_field.dart';
+import 'package:dynamic_tabbar/dynamic_tabbar.dart';
 
 import '../services/auth/auth_service.dart';
 import '../services/chat/chat_sersvice.dart';
 
 class ChatPage extends StatefulWidget {
-  final String receiverEmail;
+  final String receiverName;
   final String receiverId;
 
   const ChatPage(
-      {super.key, required this.receiverEmail, required this.receiverId});
+      {super.key, required this.receiverName, required this.receiverId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
-  final AuthService _authService = AuthService();
-
+class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
+  final TextEditingController _topicController = TextEditingController();
   final ChatService _chatService = ChatService();
-
-  final TextEditingController _messageController = TextEditingController();
-
-  FocusNode myFocusNode = FocusNode();
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
-    myFocusNode.addListener(() {
-      if (myFocusNode.hasFocus) {
-        Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
-      }
-    });
-
-    Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
   }
 
-  @override
-  void dispose() {
-    myFocusNode.dispose();
-    _messageController.dispose();
-    super.dispose();
-  }
+  void createTopic(int index) async {
+    if (_topicController.text.isNotEmpty) {
+      await _chatService.createTopics(widget.receiverId, _topicController.text, index);
 
-  final ScrollController _scrollController = ScrollController();
-
-  void scrollDown() {
-    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-        duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
-  }
-
-  void sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-          widget.receiverId, _messageController.text);
-
-      _messageController.clear();
+      _topicController.clear();
     }
-
-    scrollDown();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverEmail),
+        title: Text(widget.receiverName),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
       ),
-      body: Column(
-        children: [Expanded(child: _buildMessagesList()), _buildUserInput()],
-      ),
+      body: _buildTopicList(),
     );
   }
 
-  Widget _buildMessagesList() {
+  Widget _buildTopicList() {
     String senderID = _authService.getCurrentUser()!.uid;
+
     return StreamBuilder(
-        stream: _chatService.getMessages(widget.receiverId, senderID),
+        stream: _chatService.getTopics(widget.receiverId, senderID),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text("Error");
@@ -90,54 +64,52 @@ class _ChatPageState extends State<ChatPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text("Loading...");
           }
-          return ListView(
-            controller: _scrollController,
-            children: snapshot.data!.docs
-                .map<Widget>((doc) => _buildMessagesListItem(doc))
-                .toList(),
+          return DynamicTabBarWidget(
+            showBackIcon: false,
+            showNextIcon: false,
+            isScrollable: true,
+            onTabChanged: (_)=>{},
+            dynamicTabs: snapshot.data!.docs
+                .map<TabData>((doc) => _buildTopicTab(doc))
+                .toList()
+                .followedBy([
+              _buildAddTab(snapshot.data!.docs.length)]).toList(),
+            onTabControllerUpdated: (_) {},
           );
         });
   }
 
-  Widget _buildMessagesListItem(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    bool isUser = data['senderID'] == _authService.getCurrentUser()!.uid;
-
-    var alignment = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-
-    return Column(
-      crossAxisAlignment: alignment,
-      children: [
-        ChatBubble(message: data["message"], isCurrentUser: isUser),
-      ],
+  _buildTopicTab(QueryDocumentSnapshot<Object?> doc) {
+    return TabData(
+      title: Tab(text: doc['topic']),
+      index: doc['index'],
+      content: ChatTab(
+          receiverId: widget.receiverId, topic: doc['topic']),
     );
   }
 
-  Widget _buildUserInput() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 50.0),
-      child: Row(
-        children: [
-          Expanded(
-              child: MyTextField(
-            controller: _messageController,
-            hintText: "Type a message",
-            obscure: false,
-            focusNode: myFocusNode,
-          )),
-          Container(
-              decoration: const BoxDecoration(
-                  color: Colors.green, shape: BoxShape.circle),
-              margin: const EdgeInsets.only(right: 25),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                ),
-                onPressed: sendMessage,
-              ))
-        ],
-      ),
-    );
+  _buildAddTab(int index){
+    return TabData(
+        title: const Tab(icon: Icon(Icons.add)),
+        index: index,
+        content: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Create a new Chat Topic:",
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 16)),
+              SizedBox(height: 25.0,),
+              MyTextField(
+                  hintText: "new Topic",
+                  obscure: false,
+                  controller: _topicController,
+                  focusNode: null),
+              SizedBox(height: 10.0,),
+              MyButton(text: "Create Topic", onTap: () => createTopic(index))
+            ],
+          ),
+        ));
   }
 }

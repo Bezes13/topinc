@@ -7,6 +7,7 @@ import '../components/my_text_field.dart';
 class RegisterPage extends StatelessWidget {
   // TextController for E-Mail and password
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
   final TextEditingController _pwConfirmController = TextEditingController();
   final void Function()? onLoginTap;
@@ -18,7 +19,7 @@ class RegisterPage extends StatelessWidget {
     if (_pwController.text == _pwConfirmController.text) {
       try {
         auth.signUpWithEmailAndPassword(
-            _emailController.text, _pwController.text);
+            _emailController.text, _pwController.text, _userNameController.text);
       } catch (e) {
         showDialog(
             context: context,
@@ -61,6 +62,16 @@ class RegisterPage extends StatelessWidget {
             ),
             const SizedBox(
               height: 10,
+            ),
+            MyTextField(
+              hintText: "Username",
+              obscure: false,
+              controller: _userNameController,
+              focusNode: null,
+              hint: "The name everyone else sees",
+            ),
+            const SizedBox(
+              height: 20,
             ),
             MyTextField(
               hintText: "Password",

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topinc/services/auth/auth_service.dart';
 import 'package:topinc/services/chat/chat_sersvice.dart';
 
 import '../components/my_drawer.dart';
@@ -9,6 +10,7 @@ class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   final ChatService _chatService = ChatService();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class HomePage extends StatelessWidget {
         foregroundColor: Colors.grey,
         elevation: 0,
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(),
       body: _buildUserList(),
     );
   }
@@ -44,14 +46,16 @@ class HomePage extends StatelessWidget {
   }
 
   _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
+    bool isUser = userData["uid"] == _authService.getCurrentUser()!.uid;
+    String name = isUser ? "You" : userData["name"];
     return UserTile(
-        text: userData["email"],
+        text: name,
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(
-                        receiverEmail: userData["email"],
+                        receiverName: name,
                         receiverId: userData["uid"],
                       )));
         });

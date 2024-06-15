@@ -15,7 +15,7 @@ class ChatService {
     });
   }
 
-  Future<void> sendMessage(String receiverId, message) async {
+  Future<void> sendMessage(String receiverId, message, topic) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String currentUserEmail = _auth.currentUser!.email!;
     final Timestamp timestamp = Timestamp.now();
@@ -32,19 +32,48 @@ class ChatService {
     await _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
+        .collection("topic")
+        .doc(topic)
         .collection("messages")
         .add(newMessage.toMap());
   }
 
-  Stream<QuerySnapshot> getMessages(String userID, otherUserID) {
+  Stream<QuerySnapshot> getMessages(String userID, otherUserID, topic) {
     List<String> ids = [userID, otherUserID];
     ids.sort();
     String chatRoomID = ids.join('_');
     return _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
+        .collection("topic")
+        .doc(topic)
         .collection("messages")
         .orderBy("timestamp", descending: false)
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> getTopics(String userID, otherUserID) {
+    List<String> ids = [userID, otherUserID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+    return _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("topic")
+        .orderBy("index", descending: false)
+        .snapshots();
+  }
+
+  Future<void> createTopics(String receiverId, topic, int index) async {
+    final String currentUserId = _auth.currentUser!.uid;
+
+    List<String> ids = [currentUserId, receiverId];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+    await _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("topic")
+        .add({'topic': topic, 'index': index});
   }
 }

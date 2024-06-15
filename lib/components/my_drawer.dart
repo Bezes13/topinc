@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:topinc/Pages/home_page.dart';
+import 'package:topinc/services/auth/auth_gate.dart';
 
 import '../Pages/settings_page.dart';
 import '../services/auth/auth_service.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  MyDrawer({super.key});
+  final authService = AuthService();
 
   void logout() {
-    final authService = AuthService();
     authService.signOut();
+    MaterialPageRoute(
+        builder: (context) => AuthGate());
   }
 
   @override
